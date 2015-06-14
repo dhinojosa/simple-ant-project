@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<project name="simple-ant-project" default="war">
+    <property name="src.main" value="src/main"/>
+    <property name="src.main.java" value="${src.main}/java"/>
+    <property name="src.test" value="src/test"/>
+    <property name="src.test.java" value="${src.test}/java"/>
+    <property name="src.main.webapp" value="${src.main}/webapp"/>
+    <property name="war.file" value="target/dist/simple-ant-project.war"/>
+    <property name="appserver.home" value="/home/danno/java/apache-tomcat-8.0.3"/>
+
+    <!-- Configure the directory into which the web application is built -->
+    <property name="build" value="${basedir}/build"/>
+
+    <!-- Configure the context path for this application -->
+    <property name="path" value="/simple-ant-project"/>
+
+    <!-- Configure properties to access the Manager application -->
+    <property name="tomcat.url" value="http://localhost:8080/manager/text"/>
+    <property name="tomcat.username" value="admin"/>
+    <property name="tomcat.password" value="admin"/>
+
+    <path id="catalina-ant-classpath">
+        <fileset dir="${appserver.home}/lib">
+            <include name="catalina-ant.jar"/>
+            <include name="tomcat-coyote.jar"/>
+            <include name="tomcat-util.jar"/>
+        </fileset>
+        <fileset dir="${appserver.home}/bin">
+            <include name="tomcat-juli.jar"/>
+        </fileset>
+    </path>
+
+    <!-- Configure the custom Ant tasks for the Manager application -->
+    <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask" classpathref="catalina-ant-classpath"/>
+    <taskdef name="list" classname="org.apache.catalina.ant.ListTask" classpathref="catalina-ant-classpath"/>
+    <taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask" classpathref="catalina-ant-classpath"/>
+    <taskdef name="findleaks" classname="org.apache.catalina.ant.FindLeaksTask" classpathref="catalina-ant-classpath"/>
+    <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask" classpathref="catalina-ant-classpath"/>
+    <taskdef name="start" classname="org.apache.catalina.ant.StartTask" classpathref="catalina-ant-classpath"/>
+    <taskdef name="stop" classname="org.apache.catalina.ant.StopTask" classpathref="catalina-ant-classpath"/>
+    <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask" classpathref="catalina-ant-classpath"/>
+
+    <path id="compile.classpath">
+        <fileset dir="src/main/webapp/WEB-INF/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="test.classpath">
+        <pathelement location="target/classes"/>
+        <pathelement location="target/test-classes"/>
+        <libfileset dir="lib"/>
+    </path>
+
+    <target name="init">
+        <mkdir dir="target/classes"/>
+        <mkdir dir="target/test-classes"/>
+        <mkdir dir="target/test-reports"/>
+        <mkdir dir="target/dist"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac includeantruntime="false" destdir="target/classes" debug="true" srcdir="${src.main.java}">
+            <classpath refid="compile.classpath"/>
+        </javac>
+    </target>
+
+    <target name="war" depends="compile">
+        <war destfile="${war.file}" webxml="${src.main.webapp}/WEB-INF/web.xml">
+            <classes dir="target/classes"/>
+            <fileset dir="${src.main.webapp}">
+                <exclude name="WEB-INF/lib/**/*"/>
+                <exclude name="WEB-INF/web.xml"/>
+            </fileset>
+            <lib dir="${src.main.webapp}/WEB-INF/lib">
+                <exclude name="javaee-api-6.0.jar"/>
+                <exclude name="junit.jar"/>
+            </lib>
+        </war>
+    </target>
+
+    <target name="compile-test" depends="compile">
+        <javac includeantruntime="false" destdir="target/test-classes" debug="true" srcdir="${src.test.java}">
+            <classpath refid="test.classpath"/>
+        </javac>
+    </target>
+
+    <target name="unit-test" depends="compile-test">
+        <mkdir dir="target/test-reports"/>
+        <junit printsummary="on" fork="true" haltonfailure="yes">
+            <classpath refid="test.classpath"/>
+            <formatter type="xml"/>
+            <formatter type="plain"/>
+            <batchtest todir="target/test-reports">
+                <fileset dir="${src.test.java}">
+                    <include name="**/UnitTestSuite.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="integration-test" depends="compile-test">
+        <mkdir dir="target/test-reports"/>
+        <junit printsummary="on" fork="true" haltonfailure="yes">
+            <classpath refid="test.classpath"/>
+            <formatter type="xml"/>
+            <formatter type="plain"/>
+            <batchtest todir="target/test-reports">
+                <fileset dir="${src.test.java}">
+                    <include name="**/IntegrationTestSuite.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="acceptance-test" depends="compile-test">
+        <mkdir dir="target/test-reports"/>
+        <junit printsummary="on" fork="true" haltonfailure="yes">
+            <classpath refid="test.classpath"/>
+            <formatter type="xml"/>
+            <formatter type="plain"/>
+            <batchtest todir="target/test-reports">
+                <fileset dir="${src.test.java}">
+                    <include name="**/AcceptanceTestSuite.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="clean">
+        <delete dir="target"/>
+    </target>
+
+    <target name="deploy" description="Install web application"
+            depends="war">
+        <deploy url="${tomcat.url}" username="${tomcat.username}" password="${tomcat.password}"
+                path="${path}" war="file:${war.file}"/>
+    </target>
+
+    <target name="reload" description="Reload web application"
+            depends="compile">
+        <reload url="${tomcat.url}" username="${tomcat.username}" password="${tomcat.password}"
+                path="${path}"/>
+    </target>
+
+    <target name="undeploy" description="Remove web application">
+        <undeploy url="${tomcat.url}" username="${tomcat.username}" password="${tomcat.password}"
+                  path="${path}"/>
+    </target>
+</project>
