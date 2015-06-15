@@ -56,6 +56,13 @@
 
     <path id="test.classpath">
         <pathelement location="target/instrumented"/>
+        <pathelement location="target/classes"/>
+        <pathelement location="target/test-classes"/>
+        <libfileset dir="lib"/>
+    </path>
+
+    <path id="cobertura.classpath">
+        <pathelement location="target/instrumented"/>
         <pathelement location="target/test-classes"/>
         <libfileset dir="lib"/>
     </path>
@@ -70,8 +77,17 @@
 
 
     <target name="compile" depends="init">
-        <javac includeantruntime="false" destdir="target/classes" debug="true" srcdir="${src.main.java}">
+        <javac includeantruntime="false" destdir="target/classes"
+               debug="true" srcdir="${src.main.java}">
             <classpath refid="compile.classpath"/>
+        </javac>
+    </target>
+
+    <target name="compile-test" depends="compile">
+        <javac includeantruntime="false"
+               destdir="target/test-classes" debug="true"
+               srcdir="${src.test.java}">
+            <classpath refid="test.classpath"/>
         </javac>
     </target>
 
@@ -85,30 +101,10 @@
         </cobertura-instrument>
     </target>
 
-    <target name="war" depends="compile">
-        <war destfile="${war.file}" webxml="${src.main.webapp}/WEB-INF/web.xml">
-            <classes dir="target/classes"/>
-            <fileset dir="${src.main.webapp}">
-                <exclude name="WEB-INF/lib/**/*"/>
-                <exclude name="WEB-INF/web.xml"/>
-            </fileset>
-            <lib dir="${src.main.webapp}/WEB-INF/lib">
-                <exclude name="javaee-api-6.0.jar"/>
-                <exclude name="junit.jar"/>
-            </lib>
-        </war>
-    </target>
-
-    <target name="compile-test" depends="compile">
-        <javac includeantruntime="false" destdir="target/test-classes" debug="true" srcdir="${src.test.java}">
-            <classpath refid="test.classpath"/>
-        </javac>
-    </target>
-
     <target name="unit-test" depends="instrument">
         <mkdir dir="target/test-reports"/>
         <junit printsummary="on" fork="true" haltonfailure="yes">
-            <classpath refid="test.classpath"/>
+            <classpath refid="cobertura.classpath"/>
             <formatter type="xml"/>
             <formatter type="plain"/>
             <batchtest todir="target/test-reports">
@@ -132,6 +128,24 @@
             </fileset>
         </cobertura-report>
     </target>
+
+
+
+    <target name="war" depends="compile">
+        <war destfile="${war.file}" webxml="${src.main.webapp}/WEB-INF/web.xml">
+            <classes dir="target/classes"/>
+            <fileset dir="${src.main.webapp}">
+                <exclude name="WEB-INF/lib/**/*"/>
+                <exclude name="WEB-INF/web.xml"/>
+            </fileset>
+            <lib dir="${src.main.webapp}/WEB-INF/lib">
+                <exclude name="javaee-api-6.0.jar"/>
+                <exclude name="junit.jar"/>
+            </lib>
+        </war>
+    </target>
+
+
 
     <target name="integration-test" depends="compile-test">
         <mkdir dir="target/test-reports"/>
