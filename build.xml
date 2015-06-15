@@ -145,8 +145,6 @@
         </war>
     </target>
 
-
-
     <target name="integration-test" depends="compile-test">
         <mkdir dir="target/test-reports"/>
         <junit printsummary="on" fork="true" haltonfailure="yes">
