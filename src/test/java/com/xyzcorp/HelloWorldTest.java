@@ -21,6 +21,7 @@ public class HelloWorldTest {
         HelloWorld helloWorld = new HelloWorld();
         helloWorld.setName("Logan");
         assertEquals(helloWorld.greet(), "success");
+        assertEquals(helloWorld.getName(), "Logan");
     }
 
     @Test
