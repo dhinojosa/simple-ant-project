@@ -7,6 +7,6 @@ import org.junit.runners.Suite;
 
 @RunWith(Categories.class)
 @Categories.IncludeCategory(UnitTest.class)
-@Suite.SuiteClasses( { CalculatorTest.class})
+@Suite.SuiteClasses( { HelloWorldTest.class })
 public class UnitTestSuite {
 }

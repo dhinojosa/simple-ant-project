@@ -19,6 +19,10 @@
     <property name="tomcat.username" value="admin"/>
     <property name="tomcat.password" value="admin"/>
 
+    <property name="lib.dir" value="lib"/>
+    <property name="instrumented.dir" value="target/instrumented"/>
+    <property name="coveragereport.dir" value="target/cobertura-reports"/>
+
     <path id="catalina-ant-classpath">
         <fileset dir="${appserver.home}/lib">
             <include name="catalina-ant.jar"/>
@@ -44,10 +48,14 @@
         <fileset dir="src/main/webapp/WEB-INF/lib">
             <include name="*.jar"/>
         </fileset>
+        <fileset id="lib" dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
     </path>
 
+
     <path id="test.classpath">
-        <pathelement location="target/classes"/>
+        <pathelement location="target/instrumented"/>
         <pathelement location="target/test-classes"/>
         <libfileset dir="lib"/>
     </path>
@@ -57,12 +65,24 @@
         <mkdir dir="target/test-classes"/>
         <mkdir dir="target/test-reports"/>
         <mkdir dir="target/dist"/>
+        <mkdir dir="target/instrumented"/>
     </target>
+
 
     <target name="compile" depends="init">
         <javac includeantruntime="false" destdir="target/classes" debug="true" srcdir="${src.main.java}">
             <classpath refid="compile.classpath"/>
         </javac>
+    </target>
+
+    <target name="instrument" depends="compile-test" description="Instrument the classes">
+        <taskdef classpathref="compile.classpath" resource="tasks.properties"/>
+        <cobertura-instrument todir="${instrumented.dir}" datafile="${basedir}/cobertura.ser">
+            <fileset dir="target/classes">
+                <include name="**/*.class"/>
+                <exclude name="**/*Test*.class"/>
+            </fileset>
+        </cobertura-instrument>
     </target>
 
     <target name="war" depends="compile">
@@ -85,7 +105,7 @@
         </javac>
     </target>
 
-    <target name="unit-test" depends="compile-test">
+    <target name="unit-test" depends="instrument">
         <mkdir dir="target/test-reports"/>
         <junit printsummary="on" fork="true" haltonfailure="yes">
             <classpath refid="test.classpath"/>
@@ -97,6 +117,20 @@
                 </fileset>
             </batchtest>
         </junit>
+        <cobertura-report format="html" destdir="${coveragereport.dir}"
+                          datafile="${basedir}/cobertura.ser">
+            <fileset dir="${src.main.java}">
+                <include name="**/*.java"/>
+                <include name="**/*.groovy"/>
+            </fileset>
+        </cobertura-report>
+        <cobertura-report format="xml" destdir="${coveragereport.dir}"
+                          datafile="${basedir}/cobertura.ser">
+            <fileset dir="${src.main.java}">
+                <include name="**/*.java"/>
+                <include name="**/*.groovy"/>
+            </fileset>
+        </cobertura-report>
     </target>
 
     <target name="integration-test" depends="compile-test">

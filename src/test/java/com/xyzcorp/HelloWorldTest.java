@@ -3,6 +3,7 @@ package com.xyzcorp;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -15,8 +16,11 @@ import static org.junit.Assert.assertTrue;
 public class HelloWorldTest {
 
     @Test
+    @Category(UnitTest.class)
     public void simpleUnitTest() {
-        assertTrue(true);
+        HelloWorld helloWorld = new HelloWorld();
+        helloWorld.setName("Logan");
+        assertEquals(helloWorld.greet(), "success");
     }
 
     @Test
