@@ -171,15 +171,15 @@
     </target>
 
     <target name="acceptance-test" depends="compile-test">
-        <mkdir dir="target/test-reports"/>
+        <mkdir dir="target/acceptance-test-reports"/>
         <junit printsummary="on" fork="true" haltonfailure="yes">
             <classpath refid="integration.test.classpath"/>
             <formatter type="xml"/>
             <formatter type="plain"/>
             <batchtest todir="target/acceptance-test-reports">
-                <fileset dir="${src.test.java}">
-                    <include name="**/AcceptanceTestSuite.java"/>
-                </fileset>
+                <resources>
+                    <zipentry zipfile="target/dist/simple-ant-project-tests.jar" name="**/*Test.class"/>
+                </resources>
             </batchtest>
         </junit>
     </target>
