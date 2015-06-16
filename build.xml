@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="simple-ant-project" default="war">
+<project name="simple-ant-project" default="dist">
     <property name="src.main" value="src/main"/>
     <property name="src.main.java" value="${src.main}/java"/>
     <property name="src.test" value="src/test"/>
