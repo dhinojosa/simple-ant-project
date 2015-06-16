@@ -6,6 +6,7 @@
     <property name="src.test.java" value="${src.test}/java"/>
     <property name="src.main.webapp" value="${src.main}/webapp"/>
     <property name="war.file" value="target/dist/simple-ant-project.war"/>
+    <property name="test.jar.file" value="target/dist/simple-ant-project-tests.jar"/>
     <property name="appserver.home" value="/home/danno/java/apache-tomcat-8.0.3"/>
 
     <!-- Configure the directory into which the web application is built -->
@@ -59,6 +60,11 @@
         <pathelement location="target/classes"/>
         <pathelement location="target/test-classes"/>
         <libfileset dir="lib"/>
+    </path>
+
+    <path id="integration.test.classpath">
+        <libfileset dir="lib"/>
+        <libfileset dir="target/dist"/>
     </path>
 
     <path id="cobertura.classpath">
@@ -131,7 +137,7 @@
 
 
 
-    <target name="war" depends="compile">
+    <target name="dist" depends="unit-test">
         <war destfile="${war.file}" webxml="${src.main.webapp}/WEB-INF/web.xml">
             <classes dir="target/classes"/>
             <fileset dir="${src.main.webapp}">
@@ -143,18 +149,23 @@
                 <exclude name="junit.jar"/>
             </lib>
         </war>
+        <jar destfile="${test.jar.file}"
+             basedir="target/test-classes"
+             includes="**/*.class"/>
     </target>
 
+
+
     <target name="integration-test" depends="compile-test">
-        <mkdir dir="target/test-reports"/>
+        <mkdir dir="target/integration-test-reports"/>
         <junit printsummary="on" fork="true" haltonfailure="yes">
-            <classpath refid="test.classpath"/>
+            <classpath refid="integration.test.classpath"/>
             <formatter type="xml"/>
             <formatter type="plain"/>
-            <batchtest todir="target/test-reports">
-                <fileset dir="${src.test.java}">
-                    <include name="**/IntegrationTestSuite.java"/>
-                </fileset>
+            <batchtest todir="target/integration-test-reports">
+                <resources>
+                    <zipentry zipfile="target/dist/simple-ant-project-tests.jar" name="**/*Test.class"/>
+                </resources>
             </batchtest>
         </junit>
     </target>
@@ -162,10 +173,10 @@
     <target name="acceptance-test" depends="compile-test">
         <mkdir dir="target/test-reports"/>
         <junit printsummary="on" fork="true" haltonfailure="yes">
-            <classpath refid="test.classpath"/>
+            <classpath refid="integration.test.classpath"/>
             <formatter type="xml"/>
             <formatter type="plain"/>
-            <batchtest todir="target/test-reports">
+            <batchtest todir="target/acceptance-test-reports">
                 <fileset dir="${src.test.java}">
                     <include name="**/AcceptanceTestSuite.java"/>
                 </fileset>
@@ -178,7 +189,7 @@
     </target>
 
     <target name="deploy" description="Install web application"
-            depends="war">
+            depends="dist">
         <deploy url="${tomcat.url}" username="${tomcat.username}" password="${tomcat.password}"
                 path="${path}" war="file:${war.file}"/>
     </target>
@@ -193,4 +204,6 @@
         <undeploy url="${tomcat.url}" username="${tomcat.username}" password="${tomcat.password}"
                   path="${path}"/>
     </target>
+
+
 </project>
