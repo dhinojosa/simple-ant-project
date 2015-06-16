@@ -4,6 +4,7 @@ package com.xyzcorp;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -23,6 +24,7 @@ public class SeleniumTest {
     private boolean acceptNextAlert = true;
 
     @Before
+    @Category(AcceptanceTest.class)
     public void setUp() throws MalformedURLException {
         baseUrl = "http://google.com";
         DesiredCapabilities capability = DesiredCapabilities.firefox();
@@ -32,6 +34,7 @@ public class SeleniumTest {
     }
 
     @Test
+    @Category(AcceptanceTest.class)
     public void testSeleniumBacked() throws Exception {
         driver.get(baseUrl + "about:startpage");
         driver.findElement(By.id("sbi")).clear();
@@ -46,6 +49,7 @@ public class SeleniumTest {
     }
 
     @After
+    @Category(AcceptanceTest.class)
     public void tearDown() throws Exception {
         driver.quit();
         String verificationErrorString = verificationErrors.toString();
