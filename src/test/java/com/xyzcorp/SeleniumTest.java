@@ -28,6 +28,7 @@ public class SeleniumTest {
     public void testSeleniumBacked() throws Exception {
         baseUrl = "http://google.com";
         DesiredCapabilities capability = DesiredCapabilities.firefox();
+        capability.setCapability("jenkins.label", "Stranger");
         driver = new RemoteWebDriver
                 (new URL("http://192.168.57.1:4444/wd/hub"), capability);
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
