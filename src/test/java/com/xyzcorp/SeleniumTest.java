@@ -23,19 +23,14 @@ public class SeleniumTest {
     private StringBuffer verificationErrors = new StringBuffer();
     private boolean acceptNextAlert = true;
 
-    @Before
+    @Test
     @Category(AcceptanceTest.class)
-    public void setUp() throws MalformedURLException {
+    public void testSeleniumBacked() throws Exception {
         baseUrl = "http://google.com";
         DesiredCapabilities capability = DesiredCapabilities.firefox();
         driver = new RemoteWebDriver
                 (new URL("http://192.168.57.1:4444/wd/hub"), capability);
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-    }
-
-    @Test
-    @Category(AcceptanceTest.class)
-    public void testSeleniumBacked() throws Exception {
         driver.get(baseUrl + "about:startpage");
         driver.findElement(By.id("sbi")).clear();
         driver.findElement(By.id("sbi")).sendKeys("Birds of the Southwest");
@@ -46,11 +41,6 @@ public class SeleniumTest {
         driver.findElement(By.linkText("Lucifer sheartail")).click();
         assertEquals("Calothorax lucifer", driver.findElement(By.cssSelector("p > i")).getText());
         System.out.println("Println in Selenium");
-    }
-
-    @After
-    @Category(AcceptanceTest.class)
-    public void tearDown() throws Exception {
         driver.quit();
         String verificationErrorString = verificationErrors.toString();
         if (!"".equals(verificationErrorString)) {
