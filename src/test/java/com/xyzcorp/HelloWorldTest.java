@@ -28,6 +28,7 @@ public class HelloWorldTest {
     @Category(IntegrationTest.class)
     public void simpleIntegrationTest() throws InterruptedException {
         Thread.sleep(1000);
+        System.out.println("Integration Test Ran");
         assertTrue(true);
     }
 
