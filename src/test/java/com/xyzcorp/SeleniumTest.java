@@ -42,6 +42,7 @@ public class SeleniumTest {
         assertEquals("Lucifer sheartail", driver.findElement(By.linkText("Lucifer sheartail")).getText());
         driver.findElement(By.linkText("Lucifer sheartail")).click();
         assertEquals("Calothorax lucifer", driver.findElement(By.cssSelector("p > i")).getText());
+        System.out.println("Println in Selenium");
     }
 
     @After
