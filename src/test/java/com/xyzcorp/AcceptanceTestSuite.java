@@ -7,6 +7,6 @@ import org.junit.runners.Suite;
 
 @RunWith(Categories.class)
 @Categories.IncludeCategory(AcceptanceTest.class)
-@Suite.SuiteClasses( { HelloWorldTest.class})
+@Suite.SuiteClasses( { HelloWorldTest.class, SeleniumTest.class})
 public class AcceptanceTestSuite {
 }
