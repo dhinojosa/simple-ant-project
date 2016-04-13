@@ -7,7 +7,6 @@
     <property name="src.main.webapp" value="${src.main}/webapp"/>
     <property name="war.file" value="target/dist/simple-ant-project.war"/>
     <property name="test.jar.file" value="target/dist/simple-ant-project-tests.jar"/>
-    <property name="appserver.home" value="/home/danno/java/apache-tomcat-8.0.3"/>
 
     <!-- Configure the directory into which the web application is built -->
     <property name="build" value="${basedir}/build"/>
@@ -23,27 +22,6 @@
     <property name="lib.dir" value="lib"/>
     <property name="instrumented.dir" value="target/instrumented"/>
     <property name="coveragereport.dir" value="target/cobertura-reports"/>
-
-    <path id="catalina-ant-classpath">
-        <fileset dir="${appserver.home}/lib">
-            <include name="catalina-ant.jar"/>
-            <include name="tomcat-coyote.jar"/>
-            <include name="tomcat-util.jar"/>
-        </fileset>
-        <fileset dir="${appserver.home}/bin">
-            <include name="tomcat-juli.jar"/>
-        </fileset>
-    </path>
-
-    <!-- Configure the custom Ant tasks for the Manager application -->
-    <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask" classpathref="catalina-ant-classpath"/>
-    <taskdef name="list" classname="org.apache.catalina.ant.ListTask" classpathref="catalina-ant-classpath"/>
-    <taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask" classpathref="catalina-ant-classpath"/>
-    <taskdef name="findleaks" classname="org.apache.catalina.ant.FindLeaksTask" classpathref="catalina-ant-classpath"/>
-    <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask" classpathref="catalina-ant-classpath"/>
-    <taskdef name="start" classname="org.apache.catalina.ant.StartTask" classpathref="catalina-ant-classpath"/>
-    <taskdef name="stop" classname="org.apache.catalina.ant.StopTask" classpathref="catalina-ant-classpath"/>
-    <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask" classpathref="catalina-ant-classpath"/>
 
     <path id="compile.classpath">
         <fileset dir="src/main/webapp/WEB-INF/lib">
@@ -170,40 +148,7 @@
         </junit>
     </target>
 
-    <target name="acceptance-test" depends="compile-test">
-        <mkdir dir="target/acceptance-test-reports"/>
-        <junit printsummary="on" fork="true" haltonfailure="yes">
-            <classpath refid="integration.test.classpath"/>
-            <formatter type="xml"/>
-            <formatter type="plain"/>
-            <batchtest todir="target/acceptance-test-reports">
-                <resources>
-                    <zipentry zipfile="target/dist/simple-ant-project-tests.jar" name="**/*Test.class"/>
-                </resources>
-            </batchtest>
-        </junit>
-    </target>
-
     <target name="clean">
         <delete dir="target"/>
     </target>
-
-    <target name="deploy" description="Install web application"
-            depends="dist">
-        <deploy url="${tomcat.url}" username="${tomcat.username}" password="${tomcat.password}"
-                path="${path}" war="file:${war.file}"/>
-    </target>
-
-    <target name="reload" description="Reload web application"
-            depends="compile">
-        <reload url="${tomcat.url}" username="${tomcat.username}" password="${tomcat.password}"
-                path="${path}"/>
-    </target>
-
-    <target name="undeploy" description="Remove web application">
-        <undeploy url="${tomcat.url}" username="${tomcat.username}" password="${tomcat.password}"
-                  path="${path}"/>
-    </target>
-
-
 </project>
