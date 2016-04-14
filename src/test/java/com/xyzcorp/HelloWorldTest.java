@@ -19,8 +19,7 @@ public class HelloWorldTest {
     @Category(UnitTest.class)
     public void simpleUnitTest() {
         HelloWorld helloWorld = new HelloWorld();
-        //This ought to cause problems!
-        helloWorld.setName("Chris");
+        helloWorld.setName("Logan");
         assertEquals(helloWorld.greet(), "success");
         assertEquals(helloWorld.getName(), "Logan");
     }
