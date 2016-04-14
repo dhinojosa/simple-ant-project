@@ -20,7 +20,7 @@ public class HelloWorldTest {
     public void simpleUnitTest() {
         HelloWorld helloWorld = new HelloWorld();
         //This ought to cause problems!
-        helloWorld.setName("Logan");
+        helloWorld.setName("Chris");
         assertEquals(helloWorld.greet(), "success");
         assertEquals(helloWorld.getName(), "Logan");
     }
